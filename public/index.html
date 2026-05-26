@@ -1,7 +1,397 @@
-<h1>Hello World</h1>
-<p>提出するURLのページ</p>
-<p>ローカルからファイルを編集し、変更をWebサイトに反映させる</p>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taro Yamada | Portfolio & Self-Introduction</title>
+  <meta name="description" content="山田太郎の自己紹介・ポートフォリオサイトです。Web開発やデザインのスキル、制作実績などを紹介しています。">
+  
+  <!-- Relatives Path to Style Sheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
 
-<p>コードの編集はローカルのテキストエディタで行う</p>
-<p>ソースコードの保管場所はGitHub</p>
-<p>デプロイして世界中に公開するのはcloudflare</p>
+  <!-- Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="logo" id="nav-logo">
+        <span>✨</span> Taro.Dev
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about">私について</a></li>
+        <li><a href="#skills">スキル</a></li>
+        <li><a href="#works">実績</a></li>
+        <li><a href="#contact">連絡先</a></li>
+      </ul>
+      <div class="nav-controls">
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="テーマ切り替え">
+          <!-- Moon Icon -->
+          <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+          <!-- Sun Icon -->
+          <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m2.828-9.9a5 5 0 11-7.07 7.07 5 5 0 017.07-7.07z"></path>
+          </svg>
+        </button>
+        <a href="#contact" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 9999px; box-shadow: none;">お問い合わせ</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span>👋</span> はじめまして！私の紹介ページへようこそ
+      </div>
+      <h1 class="hero-title">
+        こんにちは、<br>
+        <span>山田 太郎</span> です。
+      </h1>
+      <p class="hero-description">
+        Web開発とUI/UXデザインを行っているクリエイティブエンジニアです。美しく、使いやすく、そして価値を生み出すデジタルプロダクトを構築することに情熱を注いでいます。💻🚀
+      </p>
+      <div class="hero-buttons">
+        <a href="#about" class="btn btn-primary">私について知る ➔</a>
+        <a href="#works" class="btn btn-secondary">実績を見る</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="avatar-wrapper">
+        <div class="avatar-inner">
+          <span class="avatar-emoji">👨‍💻</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about">
+    <div class="section-header">
+      <span class="section-subtitle">ABOUT ME</span>
+      <h2 class="section-title">私について</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-info-box">
+        <ul class="about-details">
+          <li>
+            <span class="label">名前</span>
+            <span class="value">山田 太郎 (やまだ たろう)</span>
+          </li>
+          <li>
+            <span class="label">役職</span>
+            <span class="value">フロントエンドエンジニア / デザイナー</span>
+          </li>
+          <li>
+            <span class="label">活動拠点</span>
+            <span class="value">東京都、日本</span>
+          </li>
+          <li>
+            <span class="label">趣味</span>
+            <span class="value">旅行、カフェ巡り、ガジェット集め</span>
+          </li>
+          <li>
+            <span class="label">好きな言葉</span>
+            <span class="value">"Simplicity is the ultimate sophistication."</span>
+          </li>
+        </ul>
+      </div>
+      <div class="about-text">
+        <h3>モノづくりを通じて、より良いデジタル体験を。🎨</h3>
+        <p>
+          大学卒業後、Web制作会社でフロントエンドエンジニアとして3年間勤務。その後、より良いユーザー体験（UX）を創出するためにUI/UXデザインのスキルも習得しました。
+        </p>
+        <p>
+          現在は、最新のウェブ技術を活用しつつ、ユーザーにとって直感的で心地よいデザインと機能性を両立させたWebアプリケーションの開発に取り組んでいます。単にコードを書くだけでなく、目的やターゲットに合わせた丁寧な設計を心がけています。✨
+        </p>
+        <a href="#contact" class="btn btn-primary" style="margin-top: 1rem;">一緒に仕事をする 🤝</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills">
+    <div class="section-header">
+      <span class="section-subtitle">MY SKILLS</span>
+      <h2 class="section-title">スキル・技術</h2>
+    </div>
+    
+    <!-- Filter Tabs -->
+    <div class="skills-tabs">
+      <button class="tab-btn active" data-filter="all">すべて</button>
+      <button class="tab-btn" data-filter="frontend">フロントエンド</button>
+      <button class="tab-btn" data-filter="backend">バックエンド</button>
+      <button class="tab-btn" data-filter="design">デザイン</button>
+    </div>
+
+    <!-- Skills Grid -->
+    <div class="skills-grid">
+      
+      <!-- Skill 1 -->
+      <div class="skill-card" data-category="frontend">
+        <div class="skill-icon">🎨</div>
+        <h3>HTML5 / CSS3</h3>
+        <p>セマンティックなHTML構造の設計と、レスポンシブWebデザイン、複雑なCSSアニメーションの実装を得意としています。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>90%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="90"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill 2 -->
+      <div class="skill-card" data-category="frontend">
+        <div class="skill-icon">⚡</div>
+        <h3>JavaScript</h3>
+        <p>ES6+のモダンJavaScript、DOM操作、非同期処理、およびSPAフレームワークのベース理解を持っています。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>85%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="85"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill 3 -->
+      <div class="skill-card" data-category="frontend">
+        <div class="skill-icon">🦕</div>
+        <h3>TypeScript</h3>
+        <p>静的型付けによる堅牢なコード設計、インターフェースやジェネリクスを活用した保守性の高い開発が可能です。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>80%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="80"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill 4 -->
+      <div class="skill-card" data-category="backend">
+        <div class="skill-icon">🟢</div>
+        <h3>Node.js</h3>
+        <p>ExpressなどのWebフレームワークを使用したREST APIの設計・構築や、データベースとの連携実装が可能です。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>75%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="75"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill 5 -->
+      <div class="skill-card" data-category="backend">
+        <div class="skill-icon">🐍</div>
+        <h3>Python</h3>
+        <p>データ処理、簡単なWebスクレイピングスクリプト、タスク自動化スクリプトの作成実績があります。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>70%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="70"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill 6 -->
+      <div class="skill-card" data-category="design">
+        <div class="skill-icon">📐</div>
+        <h3>UI/UX Design</h3>
+        <p>ユーザー調査、カスタマージャーニーマップの作成、ワイヤーフレーム設計から一貫したUIデザイン設計を行います。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>80%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="80"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill 7 -->
+      <div class="skill-card" data-category="design">
+        <div class="skill-icon">💎</div>
+        <h3>Figma</h3>
+        <p>デザインシステムの構築、再利用可能なコンポーネント設計、高精度プロトタイプの作成ができます。</p>
+        <div class="skill-level-wrapper">
+          <div class="skill-level-label">
+            <span>理解度</span>
+            <span>85%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-level="85"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Works Section -->
+  <section id="works">
+    <div class="section-header">
+      <span class="section-subtitle">PORTFOLIO</span>
+      <h2 class="section-title">制作実績</h2>
+    </div>
+    <div class="works-grid">
+      
+      <!-- Work 1 -->
+      <div class="work-card">
+        <div class="work-thumbnail" style="background: linear-gradient(135deg, #6366f1, #3b82f6);">
+          <span class="work-thumbnail-emoji">📱</span>
+        </div>
+        <div class="work-info">
+          <div class="work-tags">
+            <span class="work-tag">Design</span>
+            <span class="work-tag">HTML/CSS</span>
+            <span class="work-tag">Responsive</span>
+          </div>
+          <h3>ポートフォリオサイト</h3>
+          <p>自身を紹介するためのクリーンなシングルページポートフォリオ。洗練されたトランジション、ダークモード切り替え、インタラクティブ要素を実装しています。</p>
+          <a href="#" class="work-link">
+            詳細を見る 
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Work 2 -->
+      <div class="work-card">
+        <div class="work-thumbnail" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <span class="work-thumbnail-emoji">🗓️</span>
+        </div>
+        <div class="work-info">
+          <div class="work-tags">
+            <span class="work-tag">React</span>
+            <span class="work-tag">Node.js</span>
+            <span class="work-tag">SPA</span>
+          </div>
+          <h3>タスク管理Webアプリ</h3>
+          <p>ドラッグ&ドロップでのタスク移動やタグ管理、期日リマインダー機能を備えたWebベースのダッシュボード管理システムです。</p>
+          <a href="#" class="work-link">
+            詳細を見る 
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Work 3 -->
+      <div class="work-card">
+        <div class="work-thumbnail" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          <span class="work-thumbnail-emoji">🛍️</span>
+        </div>
+        <div class="work-info">
+          <div class="work-tags">
+            <span class="work-tag">UI/UX</span>
+            <span class="work-tag">Figma</span>
+            <span class="work-tag">Prototype</span>
+          </div>
+          <h3>ECアプリ UI/UX設計</h3>
+          <p>「使いやすさ」と「購買体験の向上」を追求したスマートフォン向けECアプリのデザインカンプ。ユーザーリサーチからプロトタイプ制作まで担当しました。</p>
+          <a href="#" class="work-link">
+            詳細を見る 
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <div class="section-header">
+      <span class="section-subtitle">GET IN TOUCH</span>
+      <h2 class="section-title">お問い合わせ</h2>
+    </div>
+    <div class="contact-container">
+      <div class="contact-info-cards">
+        
+        <!-- Info Card 1 -->
+        <div class="contact-card">
+          <div class="contact-icon-wrapper">📧</div>
+          <div>
+            <h4>メールアドレス</h4>
+            <p><a href="mailto:yamada.taro@example.com">yamada.taro@example.com</a></p>
+          </div>
+        </div>
+
+        <!-- Info Card 2 -->
+        <div class="contact-card">
+          <div class="contact-icon-wrapper">📍</div>
+          <div>
+            <h4>活動拠点</h4>
+            <p>東京都新宿区</p>
+          </div>
+        </div>
+
+        <!-- Info Card 3 -->
+        <div class="contact-card">
+          <div class="contact-icon-wrapper">🐙</div>
+          <div>
+            <h4>GitHub</h4>
+            <p><a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com/yamadataro</a></p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="contact-form-wrapper">
+        <form id="contact-form">
+          <div class="form-group">
+            <label for="name">お名前</label>
+            <input type="text" id="name" class="form-control" placeholder="山田 太郎" required>
+          </div>
+          <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input type="email" id="email" class="form-control" placeholder="yamada@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="message">メッセージ</label>
+            <textarea id="message" class="form-control" placeholder="メッセージを入力してください..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary form-submit-btn">メッセージを送信 🚀</button>
+          <div id="form-status" class="form-status"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-socials">
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">🐙</a>
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Twitter">🐦</a>
+        <a href="mailto:yamada.taro@example.com" class="social-link" aria-label="Email">📧</a>
+      </div>
+      <p class="copyright">&copy; 2026 Taro Yamada. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Relatives Path to JavaScript -->
+  <script src="./script.js"></script>
+</body>
+</html>
