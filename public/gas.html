@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フルーツ好み一覧</title>
+    <style>
+        :root {
+            --primary-color: #4a5568;
+            --bg-color: #f7fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: #2d3748;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-like {
+            background-color: #e6fffa;
+            color: #234e52;
+        }
+
+        .status-dislike {
+            background-color: #fff5f5;
+            color: #742a2a;
+        }
+
+        #loading {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        #error-message {
+            color: #e53e3e;
+            background-color: #fff5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>フルーツ好み調査結果</h1>
+
+        <div id="error-message"></div>
+        <div id="loading">データを読み込み中...</div>
+
+        <div class="table-container">
+            <table id="data-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>フルーツの種類</th>
+                        <th>好き / 嫌い</th>
+                        <th>理由</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ あなたがデプロイした GAS の「ウェブアプリのURL」に差し替えてください
+        const GAS_API_URL = 'https://script.google.com/macros/s/XXXXX/exec';
+
+        async function fetchFruitData() {
+            const loadingEl = document.getElementById('loading');
+            const tableEl = document.getElementById('data-table');
+            const tbodyEl = document.getElementById('table-body');
+            const errorEl = document.getElementById('error-message');
+
+            try {
+                const response = await fetch(GAS_API_URL);
+                if (!response.ok) {
+                    throw new Error('データの取得に失敗しました。');
+                }
+
+                const data = await response.json();
+
+                // テーブルを生成
+                data.forEach(row => {
+                    // row: ["りんご", "嫌い", "甘いから"]
+                    if (row.length >= 3) {
+                        const tr = document.createElement('tr');
+
+                        // フルーツ名
+                        const tdName = document.createElement('td');
+                        tdName.textContent = row[0];
+                        tr.appendChild(tdName);
+
+                        // 好き嫌い (見た目を少しリッチに)
+                        const tdStatus = document.createElement('td');
+                        const statusSpan = document.createElement('span');
+                        statusSpan.textContent = row[1];
+                        statusSpan.classList.add('status');
+                        if (row[1] === '好き') {
+                            statusSpan.classList.add('status-like');
+                        } else if (row[1] === '嫌い') {
+                            statusSpan.classList.add('status-dislike');
+                        }
+                        tdStatus.appendChild(statusSpan);
+                        tr.appendChild(tdStatus);
+
+                        // 原因・理由
+                        const tdReason = document.createElement('td');
+                        tdReason.textContent = row[2];
+                        tr.appendChild(tdReason);
+
+                        tbodyEl.appendChild(tr);
+                    }
+                });
+
+                // 表示の切り替え
+                loadingEl.style.display = 'none';
+                tableEl.style.display = 'table';
+
+            } catch (error) {
+                console.error(error);
+                loadingEl.style.display = 'none';
+                errorEl.textContent = `エラー: ${error.message}。GASのURLやCORS設定、Webアプリとしての公開設定を確認してください。`;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // 画面読み込み時に実行
+        window.addEventListener('DOMContentLoaded', fetchFruitData);
+    </script>
+
+</body>
+
+</html>
