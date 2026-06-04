@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタル掲示板 | GAS & Spreadsheet デモ</title>
+    <meta name="description" content="Google Apps Scriptとスプレッドシートをバックエンドに採用した、リアルタイム掲示板デモです。">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./style.css">
+    
+    <style>
+        /* Custom Keijiban layout styles using Design System tokens */
+        .keijiban-container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            min-height: 85vh;
+        }
+
+        .keijiban-header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .keijiban-subtitle {
+            color: var(--accent-primary);
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .keijiban-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .keijiban-title span {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .keijiban-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Config Panel */
+        .config-panel {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .config-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .config-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .config-body {
+            margin-top: 1.25rem;
+            display: none;
+            animation: slideDown 0.3s ease-out forwards;
+        }
+
+        .config-body.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .config-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .config-row .form-control {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        /* Layout Grid */
+        .keijiban-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .keijiban-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Board Card */
+        .board-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-normal);
+        }
+
+        .board-card:hover {
+            box-shadow: var(--shadow-xl);
+        }
+
+        .board-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Active Navigation Link Override */
+        .nav-links a.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Message Cards Header */
+        .posts-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .posts-list-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all var(--transition-fast);
+        }
+
+        .refresh-btn:hover {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        .refresh-btn svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.5s ease;
+        }
+
+        .refresh-btn:active svg {
+            transform: rotate(360deg);
+        }
+
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Scrollbar Styling */
+        .posts-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .posts-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .posts-container::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 9999px;
+        }
+
+        .post-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-normal);
+            animation: fadeInPost 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .post-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(79, 70, 229, 0.2);
+        }
+
+        @keyframes fadeInPost {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15);
+            user-select: none;
+        }
+
+        .post-content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.35rem;
+            gap: 0.5rem;
+        }
+
+        .post-author {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .post-body {
+            color: var(--text-secondary);
+            font-size: 0.925rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* States */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text-muted);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        .empty-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none;
+            animation: fadeInPost 0.3s ease-out forwards;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo" id="nav-logo">
+                <span>✨</span> Taro.Dev
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">ポートフォリオ</a></li>
+                <li><a href="gas.html">フルーツ好みデモ</a></li>
+                <li><a href="#" class="active">掲示板</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="テーマ切り替え">
+                    <!-- Moon Icon -->
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                    <!-- Sun Icon -->
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m2.828-9.9a5 5 0 11-7.07 7.07 5 5 0 017.07-7.07z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="keijiban-container">
+        <div class="keijiban-header">
+            <span class="keijiban-subtitle">DEMONSTRATION</span>
+            <h1 class="keijiban-title">デジタル<span>掲示板</span></h1>
+            <p class="keijiban-description">
+                Google Apps Script (GAS) と Googleスプレッドシートをバックエンドに採用した、リアルタイムでの投稿＆表示デモです。
+            </p>
+        </div>
+
+        <!-- Connection Settings Panel -->
+        <div class="config-panel">
+            <div class="config-header" id="config-header">
+                <div class="config-title">
+                    <span>⚙️</span> GAS API 接続設定
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span id="config-status" class="config-status">接続状態の確認中...</span>
+                    <span id="toggle-icon" style="font-size: 0.8rem; color: var(--text-muted);">▼</span>
+                </div>
+            </div>
+            <div class="config-body" id="config-body">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    ご自身でデプロイした GAS ウェブアプリのURLを入力することで、実際の動作をご確認いただけます。
+                </p>
+                <div class="config-row">
+                    <input type="url" id="gas-url-input" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                    <button id="save-url-btn" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">設定を保存 💾</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Display -->
+        <div id="form-alert" class="alert"></div>
+
+        <div class="keijiban-grid">
+            <!-- Left Side: Form -->
+            <div class="board-card">
+                <h3><span>✍️</span> 新規メッセージ投稿</h3>
+                <form id="post-form">
+                    <div class="form-group">
+                        <label for="post-name">お名前</label>
+                        <input type="text" id="post-name" class="form-control" placeholder="匿名希望" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="post-message">投稿内容 (必須)</label>
+                        <textarea id="post-message" class="form-control" placeholder="メッセージを入力してください..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary form-submit-btn" style="width: 100%;">
+                        メッセージを投稿 🚀
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Side: Message List -->
+            <div class="board-card">
+                <div class="posts-list-header">
+                    <h2 class="posts-list-title">投稿一覧</h2>
+                    <button id="refresh-btn" class="refresh-btn" aria-label="タイムライン更新">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3m-3-3v12">
+                            </path>
+                        </svg>
+                        更新する
+                    </button>
+                </div>
+
+                <div id="posts-container" class="posts-container">
+                    <!-- Loaded dynamically -->
+                    <div class="loader">
+                        <div class="spinner"></div>
+                        <p>投稿データを取得しています...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-socials">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-link"
+                    aria-label="GitHub">🐙</a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-link"
+                    aria-label="Twitter">🐦</a>
+                <a href="mailto:yamada.taro@example.com" class="social-link" aria-label="Email">📧</a>
+            </div>
+            <p class="copyright">&copy; 2026 Taro Yamada. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Client Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Toggle ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // --- Config Panel Toggle ---
+            const configHeader = document.getElementById('config-header');
+            const configBody = document.getElementById('config-body');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            configHeader.addEventListener('click', () => {
+                configBody.classList.toggle('active');
+                if (configBody.classList.contains('active')) {
+                    toggleIcon.textContent = '▲';
+                } else {
+                    toggleIcon.textContent = '▼';
+                }
+            });
+
+            // --- GAS API URL Management ---
+            const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw0HxOgLw-4pMcdw-_vA5aKgpC3eApNHvH0R6Tzci_xMTfnG3bEtodYH09eTbGRi_N2/exec';
+            const gasUrlInput = document.getElementById('gas-url-input');
+            const saveUrlBtn = document.getElementById('save-url-btn');
+            const configStatus = document.getElementById('config-status');
+
+            // Load saved URL or set default
+            let gasApiUrl = localStorage.getItem('gas_keijiban_url') || DEFAULT_GAS_URL;
+            gasUrlInput.value = gasApiUrl;
+
+            const updateConnectionStatus = async (url) => {
+                configStatus.textContent = '接続中...';
+                configStatus.className = 'config-status';
+                try {
+                    // Test connection by fetching list
+                    const response = await fetch(`${url}?mode=list`);
+                    if (response.ok) {
+                        configStatus.textContent = '接続成功';
+                        configStatus.className = 'config-status status-success';
+                        return true;
+                    } else {
+                        throw new Error('Response not OK');
+                    }
+                } catch (error) {
+                    configStatus.textContent = '接続未確認/エラー';
+                    configStatus.className = 'config-status status-error';
+                    return false;
+                }
+            };
+
+            // Save custom GAS API URL
+            saveUrlBtn.addEventListener('click', async () => {
+                const newUrl = gasUrlInput.value.trim();
+                if (!newUrl) {
+                    showAlert('GAS Web App URLを入力してください。', 'error');
+                    return;
+                }
+                gasApiUrl = newUrl;
+                localStorage.setItem('gas_keijiban_url', newUrl);
+                showAlert('API URLを保存しました。', 'success');
+
+                await updateConnectionStatus(newUrl);
+                fetchPosts();
+            });
+
+            // --- Alert Helper ---
+            const alertEl = document.getElementById('form-alert');
+            const showAlert = (message, type) => {
+                alertEl.textContent = message;
+                alertEl.className = `alert alert-${type}`;
+                alertEl.style.display = 'block';
+
+                // Auto fadeout for success alerts
+                if (type === 'success') {
+                    setTimeout(() => {
+                        alertEl.style.opacity = '0';
+                        setTimeout(() => {
+                            alertEl.style.display = 'none';
+                            alertEl.style.opacity = '1';
+                        }, 300);
+                    }, 3000);
+                }
+            };
+
+            // --- Fetch Posts (List Mode) ---
+            const postsContainer = document.getElementById('posts-container');
+            const refreshBtn = document.getElementById('refresh-btn');
+
+            const fetchPosts = async () => {
+                // Show loading state
+                postsContainer.innerHTML = `
+                    <div class="loader">
+                        <div class="spinner"></div>
+                        <p>投稿データを取得しています...</p>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch(`${gasApiUrl}?mode=list`);
+                    if (!response.ok) {
+                        throw new Error('データの取得に失敗しました。');
+                    }
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        renderPosts(result.posts);
+                    } else {
+                        throw new Error(result.message || '不明なエラーが発生しました。');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    postsContainer.innerHTML = `
+                        <div class="empty-state" style="border-color: #ef4444; color: #ef4444;">
+                            <div class="empty-icon">⚠️</div>
+                            <p>データの取得に失敗しました。</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">${error.message}</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">設定パネルから有効なGAS APIのウェブアプリURLが設定されているか確認してください。</p>
+                        </div>
+                    `;
+                    updateConnectionStatus(gasApiUrl);
+                }
+            };
+
+            // Render Posts
+            const renderPosts = (posts) => {
+                if (!posts || posts.length === 0) {
+                    postsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">💬</div>
+                            <p>まだ投稿はありません。</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.25rem;">最初のメッセージを投稿してみましょう！</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                postsContainer.innerHTML = '';
+
+                // Show newest posts at the top (reverse chronology)
+                const sortedPosts = [...posts].reverse();
+
+                sortedPosts.forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.className = 'post-item';
+
+                    // Get avatar initial
+                    const initial = (post.name || '名').charAt(0);
+
+                    // Generate a distinct gradient color based on character code to make visual identities distinctive
+                    const charCode = initial.charCodeAt(0) || 0;
+                    const hue1 = charCode % 360;
+                    const hue2 = (hue1 + 40) % 360;
+                    const avatarStyle = `background: linear-gradient(135deg, hsl(${hue1}, 70%, 55%), hsl(${hue2}, 70%, 45%));`;
+
+                    postItem.innerHTML = `
+                        <div class="avatar" style="${avatarStyle}">${initial}</div>
+                        <div class="post-content-wrapper">
+                            <div class="post-meta">
+                                <span class="post-author">${escapeHTML(post.name || '名無しさん')}</span>
+                                <span class="post-time">${escapeHTML(formatTimestamp(post.timestamp))}</span>
+                            </div>
+                            <div class="post-body">${escapeHTML(post.message || '')}</div>
+                        </div>
+                    `;
+
+                    postsContainer.appendChild(postItem);
+                });
+            };
+
+            // Format timestamp helper
+            const formatTimestamp = (ts) => {
+                if (!ts) return '';
+                // If it is a string in ISO format or default GAS date format, format nicely
+                try {
+                    const d = new Date(ts);
+                    if (isNaN(d.getTime())) return ts; // Return as-is if parsing fails
+                    
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const date = String(d.getDate()).padStart(2, '0');
+                    const hours = String(d.getHours()).padStart(2, '0');
+                    const minutes = String(d.getMinutes()).padStart(2, '0');
+                    return `${year}/${month}/${date} ${hours}:${minutes}`;
+                } catch {
+                    return ts;
+                }
+            };
+
+            // HTML Escape Helper to prevent XSS
+            const escapeHTML = (str) => {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            // Manual Refresh
+            refreshBtn.addEventListener('click', () => {
+                // Rotate refresh icon to give feedback
+                const svg = refreshBtn.querySelector('svg');
+                svg.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    svg.style.transform = 'none';
+                }, 500);
+                
+                fetchPosts();
+            });
+
+            // --- Post Message (Post Mode) ---
+            const postForm = document.getElementById('post-form');
+            const submitBtn = postForm.querySelector('.form-submit-btn');
+
+            postForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const nameInput = document.getElementById('post-name');
+                const messageInput = document.getElementById('post-message');
+
+                const name = nameInput.value.trim() || '名無しさん';
+                const message = messageInput.value.trim();
+
+                if (!message) {
+                    showAlert('投稿内容を入力してください。', 'error');
+                    return;
+                }
+
+                // Set Loading State
+                submitBtn.disabled = true;
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '投稿中... ⏳';
+
+                try {
+                    const queryUrl = `${gasApiUrl}?mode=post&name=${encodeURIComponent(name)}&message=${encodeURIComponent(message)}`;
+
+                    const response = await fetch(queryUrl);
+                    if (!response.ok) {
+                        throw new Error('投稿に失敗しました。ネットワーク状況を確認してください。');
+                    }
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        showAlert('投稿に成功しました！', 'success');
+                        messageInput.value = ''; // clear message textarea
+                        fetchPosts(); // refresh list
+                    } else {
+                        throw new Error(result.message || '不明なエラーが発生しました。');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showAlert(`エラー: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+
+            // --- Initialize ---
+            const init = async () => {
+                await updateConnectionStatus(gasApiUrl);
+                fetchPosts();
+            };
+            init();
+        });
+    </script>
+</body>
+
+</html>
